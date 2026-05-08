@@ -7,10 +7,7 @@ class SubmitFormInviteController < ApplicationController
   skip_authorization_check
 
   def create
-    submitter = Submitter.find_by!(slug: params[:submit_form_slug])
-    @embed_cors_account = submitter.account
-
-    set_embed_cors_headers
+    submitter = load_submitter
 
     return head :unprocessable_content unless can_invite?(submitter)
 
@@ -46,6 +43,14 @@ class SubmitFormInviteController < ApplicationController
   end
 
   private
+
+  def load_submitter
+    Submitter.find_by!(slug: params[:submit_form_slug]).tap do |submitter|
+      @embed_cors_account = submitter.account
+
+      set_embed_cors_headers
+    end
+  end
 
   def can_invite?(submitter)
     !submitter.declined_at? &&
