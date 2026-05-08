@@ -215,7 +215,13 @@ Rails.application.routes.draw do
   match '/mcp', to: 'mcp#call', via: %i[get post]
 
   post '/embed/forms', to: 'embed/forms#create'
+  scope '/embed/api', as: :embed_api, module: :api, defaults: { format: :json } do
+    resources :attachments, only: %i[create]
+    resources :submitter_email_clicks, only: %i[create]
+    resources :submitter_form_views, only: %i[create]
+  end
   match '/embed/forms', to: 'embed/forms#preflight', via: :options
+  match '/embed/api/*path', to: 'cors_preflight#show', via: :options
   match '/s/:slug', to: 'cors_preflight#show', via: :options
   match '/s/:slug/*path', to: 'cors_preflight#show', via: :options
   match '/submitters/:submitter_id/download', to: 'cors_preflight#show', via: :options
