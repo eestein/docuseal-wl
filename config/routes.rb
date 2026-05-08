@@ -215,6 +215,19 @@ Rails.application.routes.draw do
   match '/mcp', to: 'mcp#call', via: %i[get post]
 
   post '/embed/forms', to: 'embed/forms#create'
+  scope '/embed', as: :embed do
+    resources :submit_form, only: %i[update], path: 's', param: 'slug' do
+      resources :values, only: %i[index], controller: 'submit_form_values'
+      resources :download, only: %i[index], controller: 'submit_form_download'
+      resources :documents, only: %i[index], controller: 'submit_form_completed_download'
+      resources :invite, only: %i[create], controller: 'submit_form_invite'
+      resources :metadata, only: %i[index], controller: 'submit_form_metadata'
+    end
+    resources :send_submission_email, only: %i[create]
+    resources :submitters, only: %i[] do
+      resources :download, only: %i[index], controller: 'submit_form_completed_download'
+    end
+  end
   scope '/embed/api', as: :embed_api, module: :api, defaults: { format: :json } do
     resources :attachments, only: %i[create]
     resources :submitter_email_clicks, only: %i[create]
@@ -222,6 +235,10 @@ Rails.application.routes.draw do
   end
   match '/embed/forms', to: 'embed/forms#preflight', via: :options
   match '/embed/api/*path', to: 'cors_preflight#show', via: :options
+  match '/embed/s/:slug', to: 'cors_preflight#show', via: :options
+  match '/embed/s/:slug/*path', to: 'cors_preflight#show', via: :options
+  match '/embed/submitters/:submitter_id/download', to: 'cors_preflight#show', via: :options
+  match '/embed/send_submission_email', to: 'cors_preflight#show', via: :options
   match '/s/:slug', to: 'cors_preflight#show', via: :options
   match '/s/:slug/*path', to: 'cors_preflight#show', via: :options
   match '/submitters/:submitter_id/download', to: 'cors_preflight#show', via: :options

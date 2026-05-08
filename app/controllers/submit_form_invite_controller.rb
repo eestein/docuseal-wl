@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
 class SubmitFormInviteController < ApplicationController
+  include EmbedCors
+
   skip_before_action :authenticate_user!
   skip_authorization_check
 
   def create
     submitter = Submitter.find_by!(slug: params[:submit_form_slug])
+    @embed_cors_account = submitter.account
+
+    set_embed_cors_headers
 
     return head :unprocessable_content unless can_invite?(submitter)
 

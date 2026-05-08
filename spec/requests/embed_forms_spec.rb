@@ -72,4 +72,62 @@ describe 'Embed forms' do
       expect(submitter.reload.opened_at).to be_present
     end
   end
+
+  describe 'OPTIONS embed signing endpoints' do
+    let(:submitter) { create(:submission, :with_submitters, template: template).submitters.first }
+
+    it 'returns CORS preflight headers for form submissions' do
+      process :options, "/embed/s/#{submitter.slug}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Methods']).to include('POST')
+      expect(response.headers['Access-Control-Allow-Headers']).to eq('*')
+    end
+
+    it 'returns CORS preflight headers for values' do
+      process :options, "/embed/s/#{submitter.slug}/values"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Methods']).to include('POST')
+      expect(response.headers['Access-Control-Allow-Headers']).to eq('*')
+    end
+
+    it 'returns CORS preflight headers for metadata' do
+      process :options, "/embed/s/#{submitter.slug}/metadata"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Methods']).to include('POST')
+      expect(response.headers['Access-Control-Allow-Headers']).to eq('*')
+    end
+
+    it 'returns CORS preflight headers for invitations' do
+      process :options, "/embed/s/#{submitter.slug}/invite"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Methods']).to include('POST')
+      expect(response.headers['Access-Control-Allow-Headers']).to eq('*')
+    end
+
+    it 'returns CORS preflight headers for downloads' do
+      process :options, "/embed/submitters/#{submitter.slug}/download"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Methods']).to include('POST')
+      expect(response.headers['Access-Control-Allow-Headers']).to eq('*')
+    end
+
+    it 'returns CORS preflight headers for copy emails' do
+      process :options, '/embed/send_submission_email'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Methods']).to include('POST')
+      expect(response.headers['Access-Control-Allow-Headers']).to eq('*')
+    end
+  end
 end
